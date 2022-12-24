@@ -1,13 +1,8 @@
 package es.uma.informatica.misia.ae.simpleea;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 
@@ -21,7 +16,7 @@ public class Main {
 		
 		if (args[0].equals("convert")) {
 			try {
-				int[][] matrix = readMatrixFromFile(args[1]);
+				int[][] matrix = FileUtils.readMatrixFromFile(args[1]);
 				ConvertMatrixIntoImage(matrix, "output");
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -29,7 +24,7 @@ public class Main {
 		}
 		
 		if (args.length < 4) {
-			//help();
+			// help();
 			return;
 		}
 		
@@ -41,39 +36,6 @@ public class Main {
 		
 		Individual bestSolution = evolutionaryAlgorithm.run();
 		System.out.println(bestSolution);
-	}
-
-	private static int[][] readMatrixFromFile(String file) {
-		BufferedReader reader;
-		List<String> partialResult = new ArrayList<>();
-		try {
-			reader = new BufferedReader(new FileReader(file));
-			String line = reader.readLine();
-
-			while (line != null) {
-				partialResult.add(line.trim());
-				line = reader.readLine();
-			}
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		int matrix[][] = new int[partialResult.size()][];
-		for (int i = 0; i < partialResult.size(); i++) {
-			String[] split = partialResult.get(i).split("\\s+");
-			matrix[i] = new int[split.length];
-			for (int j = 0; j < split.length; j++) {
-				try {
-					matrix[i][j] = Integer.parseInt(split[j]);
-				}
-				catch(Exception ex) {
-					int a = 1;
-				}
-			}
-		}
-
-		return matrix;
 	}
 
 	private static Map<String, Double> readEAParameters(String[] args) {
@@ -102,7 +64,7 @@ public class Main {
 		    }
 		}
 		try {
-			boolean result = ImageIO.write(bufferedImage, "png", new File("output.png"));
+			boolean result = ImageIO.write(bufferedImage, "png", new File("output _" + System.currentTimeMillis() + ".png"));
 			System.out.println(result);
 		}
 		catch(Exception ex) {
