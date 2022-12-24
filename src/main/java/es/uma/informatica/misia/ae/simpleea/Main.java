@@ -1,15 +1,35 @@
 package es.uma.informatica.misia.ae.simpleea;
 
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import javax.imageio.ImageIO;
 
 public class Main {
 
 	public static void main (String args []) {
+		if (args.length < 2) {
+			// help();
+			return;
+		}
+		
+		if (args[0].equals("convert")) {
+			try {
+				int[][] matrix = readMatrixFromFile(args[1]);
+				ConvertMatrixIntoImage(matrix, "output");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		
 		if (args.length < 4) {
-			System.err.println("Invalid number of arguments");
-			System.err.println("Arguments: <population size> <function evaluations> <bitflip probability> <problem size> [<random seed>]");
+			//help();
 			return;
 		}
 		
@@ -21,6 +41,39 @@ public class Main {
 		
 		Individual bestSolution = evolutionaryAlgorithm.run();
 		System.out.println(bestSolution);
+	}
+
+	private static int[][] readMatrixFromFile(String file) {
+		BufferedReader reader;
+		List<String> partialResult = new ArrayList<>();
+		try {
+			reader = new BufferedReader(new FileReader(file));
+			String line = reader.readLine();
+
+			while (line != null) {
+				partialResult.add(line.trim());
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		int matrix[][] = new int[partialResult.size()][];
+		for (int i = 0; i < partialResult.size(); i++) {
+			String[] split = partialResult.get(i).split("\\s+");
+			matrix[i] = new int[split.length];
+			for (int j = 0; j < split.length; j++) {
+				try {
+					matrix[i][j] = Integer.parseInt(split[j]);
+				}
+				catch(Exception ex) {
+					int a = 1;
+				}
+			}
+		}
+
+		return matrix;
 	}
 
 	private static Map<String, Double> readEAParameters(String[] args) {
@@ -35,6 +88,27 @@ public class Main {
 		}
 		parameters.put(EvolutionaryAlgorithm.RANDOM_SEED_PARAM, (double)randomSeed);
 		return parameters;
+	}
+	
+	private static void ConvertMatrixIntoImage(int[][] matrix, String outputFile) throws Exception {
+		int xLenght = matrix.length;
+		int yLength = matrix[0].length;
+		BufferedImage bufferedImage = new BufferedImage(xLenght, yLength, BufferedImage.TYPE_BYTE_GRAY);
+
+		for(int x = 0; x < xLenght; x++) {
+		    for(int y = 0; y < yLength; y++) {
+		        int rgb = (int)matrix[x][y]<<16 | (int)matrix[x][y] << 8 | (int)matrix[x][y];
+		        bufferedImage.setRGB(x, y, rgb);
+		    }
+		}
+		try {
+			boolean result = ImageIO.write(bufferedImage, "png", new File("output.png"));
+			System.out.println(result);
+		}
+		catch(Exception ex) {
+			System.out.print("There's been an error converting the int matrix into an image.");
+			throw ex;
+		}
 	}
 
 }
