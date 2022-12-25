@@ -1,10 +1,14 @@
 package es.uma.informatica.misia.ae.simpleea;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 public class FileUtils {
 	public static int[][] readMatrixFromFile(String file) {
@@ -32,11 +36,33 @@ public class FileUtils {
 					matrix[i][j] = Integer.parseInt(split[j]);
 				}
 				catch(Exception ex) {
-					int a = 1;
+					System.err.println("Error reading matrix[" + i + "][" + j + "]");
 				}
 			}
 		}
 
 		return matrix;
+	}
+	
+	public static void ConvertMatrixIntoImage(int[][] matrix, int[] order, String outputFile) throws Exception {
+		int yLength = matrix[0].length;
+		BufferedImage bufferedImage = new BufferedImage(matrix.length, yLength, BufferedImage.TYPE_BYTE_GRAY);
+		
+		for (int i = 0; i < matrix.length; i++) {
+			int[] row = order == null ? matrix[i] : matrix[order[i]];
+			for (int j = 0; j < row.length; j++) {
+				int rgb = (int)row[j]<<16 | (int)row[j] << 8 | (int)row[j];
+		        bufferedImage.setRGB(i, j, rgb);
+			}
+		}
+		
+		try {
+			boolean result = ImageIO.write(bufferedImage, "png", new File(outputFile + System.currentTimeMillis() + ".png"));
+			System.out.println(result);
+		}
+		catch(Exception ex) {
+			System.out.print("There's been an error converting the int matrix into an image.");
+			throw ex;
+		}
 	}
 }

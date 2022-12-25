@@ -7,6 +7,10 @@ public class Permutation extends Individual {
 		this.setChromosome(new int[0]);
 	}
 	
+	public Permutation(int[] values) {
+		this.setChromosome(values);
+	}
+	
 	public Permutation(Permutation individual) {
 		this.setChromosome(individual.chromosome.clone());
 		this.setFitness(individual.getFitness());

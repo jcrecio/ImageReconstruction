@@ -10,6 +10,7 @@ public class EvolutionaryAlgorithm {
 	public static final String MAX_FUNCTION_EVALUATIONS_PARAM = "maxFunctionEvaluations";
 	public static final String RANDOM_SEED_PARAM = "randomSeed";
 	public static final String POPULATION_SIZE_PARAM = "populationSize";
+
 	
 	private Problem problem;
 	private int functionEvaluations;
@@ -32,7 +33,7 @@ public class EvolutionaryAlgorithm {
 	private void configureAlgorithm(Map<String, Double> parameters, Problem problem) {
 		populationSize = parameters.get(POPULATION_SIZE_PARAM).intValue();
 		maxFunctionEvaluations = parameters.get(MAX_FUNCTION_EVALUATIONS_PARAM).intValue();
-		double bitFlipProb = parameters.get(BitFlipMutation.BIT_FLIP_PROBABILITY_PARAM);
+		double mutationProb = parameters.get(PermutationMutation.PERMUTATION_PROBABILITY_PARAM);
 		long randomSeed = parameters.get(RANDOM_SEED_PARAM).longValue();
 		
 		this.problem = problem; 
@@ -41,8 +42,8 @@ public class EvolutionaryAlgorithm {
 		
 		selection = new BinaryTournament(rnd);
 		replacement = new ElitistReplacement();
-		mutation = new BitFlipMutation(rnd, bitFlipProb);
-		recombination = new SinglePointCrossover(rnd);
+		mutation = new PermutationMutation(rnd, mutationProb);
+		recombination = new PermutationCrossover(rnd);
 	}
 	
 	public Individual run() {
