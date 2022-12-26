@@ -7,9 +7,13 @@ import java.util.Random;
 public class PermutationCrossover implements Crossover {
 	
 	private Random rnd;
+	private int cut1;
+	private int cut2;
 	
-	public PermutationCrossover(Random rnd) {
+	public PermutationCrossover(Random rnd, int cut1, int cut2) {
 		this.rnd=rnd;
+		this.cut1 = cut1;
+		this.cut2 = cut2;
 	}
 
 	@Override
@@ -18,9 +22,9 @@ public class PermutationCrossover implements Crossover {
 		Permutation permutation1 = (Permutation) individual1;
 		Permutation permutation2 = (Permutation) individual2;
 		
-		// 2 points of cut
-		int cut1 = rnd.nextInt(permutation1.getChromosome().length / 2);
-		int cut2 = rnd.nextInt(cut1+1, permutation2.getChromosome().length);
+//		// 2 points of cut
+//		int cut1 = rnd.nextInt(permutation1.getChromosome().length / 2);
+//		int cut2 = rnd.nextInt(cut1+1, permutation2.getChromosome().length);
 
 		Permutation child = new Permutation(permutation1);
 		

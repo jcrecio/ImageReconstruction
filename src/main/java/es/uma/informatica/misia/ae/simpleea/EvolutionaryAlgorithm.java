@@ -10,7 +10,8 @@ public class EvolutionaryAlgorithm {
 	public static final String MAX_FUNCTION_EVALUATIONS_PARAM = "maxFunctionEvaluations";
 	public static final String RANDOM_SEED_PARAM = "randomSeed";
 	public static final String POPULATION_SIZE_PARAM = "populationSize";
-
+	public static final String CUT1 = "cut1";
+	public static final String CUT2 = "cut2";
 	
 	private Problem problem;
 	private int functionEvaluations;
@@ -35,7 +36,8 @@ public class EvolutionaryAlgorithm {
 		maxFunctionEvaluations = parameters.get(MAX_FUNCTION_EVALUATIONS_PARAM).intValue();
 		double mutationProb = parameters.get(PermutationMutation.PERMUTATION_PROBABILITY_PARAM);
 		long randomSeed = parameters.get(RANDOM_SEED_PARAM).longValue();
-		
+		int cut1 = parameters.get(CUT1).intValue();
+		int cut2 = parameters.get(CUT2).intValue();
 		this.problem = problem; 
 		
 		rnd = new Random(randomSeed);
@@ -43,7 +45,7 @@ public class EvolutionaryAlgorithm {
 		selection = new BinaryTournament(rnd);
 		replacement = new ElitistReplacement();
 		mutation = new PermutationMutation(rnd, mutationProb);
-		recombination = new PermutationCrossover(rnd);
+		recombination = new PermutationCrossover(rnd, cut1, cut2);
 	}
 	
 	public Individual run() {
@@ -71,7 +73,7 @@ public class EvolutionaryAlgorithm {
 	}
 
 	private void checkIfBest(Individual individual) {
-		if (bestSolution == null || individual.getFitness()> bestSolution.getFitness()) {
+		if (bestSolution == null || individual.getFitness() < bestSolution.getFitness()) {
 			bestSolution = individual;
 		}
 	}
