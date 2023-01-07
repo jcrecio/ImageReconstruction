@@ -65,13 +65,13 @@ public class FileUtils {
 		int yLength = matrix[0].length;
 		BufferedImage bufferedImage = new BufferedImage(matrix.length, yLength, BufferedImage.TYPE_BYTE_GRAY);
 				
-		for (int i = 0; i < 512; i++) {
-		    for (int j = i + 1; j < 512; j++) {
-		        int temp = matrix[i][j];
-		        matrix[i][j] = matrix[j][i];
-		        matrix[j][i] = temp;
-		    }
-		}
+//		for (int i = 0; i < 512; i++) {
+//		    for (int j = i + 1; j < 512; j++) {
+//		        int temp = matrix[i][j];
+//		        matrix[i][j] = matrix[j][i];
+//		        matrix[j][i] = temp;
+//		    }
+//		}
 		for (int i = 0; i < matrix.length; i++) {
 			int[] row = matrix[order[i]];
 			for (int j = 0; j < row.length; j++) {
@@ -83,7 +83,7 @@ public class FileUtils {
 		
 		try {
 			boolean result = ImageIO.write(bufferedImage, "bmp", new File(outputFile + System.currentTimeMillis() + ".bmp"));
-			System.out.println(result);
+			System.out.println("Fitness = " + outputFile);
 		}
 		catch(Exception ex) {
 			System.out.print("There's been an error converting the int matrix into an image.");

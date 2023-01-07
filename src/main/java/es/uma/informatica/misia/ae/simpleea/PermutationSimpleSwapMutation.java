@@ -2,13 +2,13 @@ package es.uma.informatica.misia.ae.simpleea;
 
 import java.util.Random;
 
-public class PermutationMutation implements Mutation {
+public class PermutationSimpleSwapMutation implements Mutation {
 
 	private double prob;
 	private Random rnd;
 	public static final String PERMUTATION_PROBABILITY_PARAM = "permutationProbability";
 	
-	public PermutationMutation (Random rnd, double prob) {
+	public PermutationSimpleSwapMutation (Random rnd, double prob) {
 		this.rnd = rnd;
 		this.prob = prob;
 	}
@@ -18,14 +18,14 @@ public class PermutationMutation implements Mutation {
 		Permutation original = (Permutation) individual;
 		Permutation mutated = new Permutation(original);
 		int length = mutated.getChromosome().length;
-		for (int i = 0; i < length; i++) {
-			if (rnd.nextDouble() < prob) {
-				int random = new Random().nextInt(length);
-				int valueA = mutated.getChromosome()[i];
-				int valueB = mutated.getChromosome()[random];
-				mutated.getChromosome()[i] = valueB;
-				mutated.getChromosome()[random] = valueA;
-			}
+		if (rnd.nextDouble() < prob) {
+			int random1 = new Random().nextInt(length);
+			int random2 = new Random().nextInt(length);
+			
+			int valueA = mutated.getChromosome()[random1];
+			int valueB = mutated.getChromosome()[random2];
+			mutated.getChromosome()[random1] = valueB;
+			mutated.getChromosome()[random2] = valueA;			
 		}
 		return mutated;
 	}

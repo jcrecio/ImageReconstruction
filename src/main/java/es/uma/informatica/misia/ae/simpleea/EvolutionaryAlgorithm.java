@@ -34,18 +34,16 @@ public class EvolutionaryAlgorithm {
 	private void configureAlgorithm(Map<String, Double> parameters, Problem problem) {
 		populationSize = parameters.get(POPULATION_SIZE_PARAM).intValue();
 		maxFunctionEvaluations = parameters.get(MAX_FUNCTION_EVALUATIONS_PARAM).intValue();
-		double mutationProb = parameters.get(PermutationMutation.PERMUTATION_PROBABILITY_PARAM);
+		double mutationProb = parameters.get(PermutationSwapMutation.PERMUTATION_PROBABILITY_PARAM);
 		long randomSeed = parameters.get(RANDOM_SEED_PARAM).longValue();
-		int cut1 = parameters.get(CUT1).intValue();
-		int cut2 = parameters.get(CUT2).intValue();
 		this.problem = problem; 
 		
 		rnd = new Random(randomSeed);
 		
 		selection = new BinaryTournament(rnd);
 		replacement = new ElitistReplacement();
-		mutation = new PermutationMutation(rnd, mutationProb);
-		recombination = new PermutationCrossover(rnd, cut1, cut2);
+		mutation = new PermutationInversionMutation(rnd, mutationProb);
+		recombination = new PermutationEdgeCrossover(rnd);
 	}
 	
 	public Individual run() {
@@ -60,6 +58,7 @@ public class EvolutionaryAlgorithm {
 			child = mutation.apply(child);
 			evaluateIndividual(child);
 			population = replacement.replacement(population, Arrays.asList(child));
+			System.out.println("Evaluation number: " + functionEvaluations + " fitness: " + + bestSolution.getFitness());
 		}
 		
 		return bestSolution;

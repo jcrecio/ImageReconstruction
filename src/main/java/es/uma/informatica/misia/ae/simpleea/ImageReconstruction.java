@@ -7,8 +7,10 @@ public class ImageReconstruction implements Problem {
 	private int[][] matrix;
 	private int n;
 	private int m;
+	private EvaluateFunction evaluate;
 	
-	public ImageReconstruction(String file) {
+	public ImageReconstruction(EvaluateFunction evaluateFunction, String file) {
+		this.evaluate = evaluateFunction;
 		this.matrix = FileUtils.readMatrixFromFile(file);
 		this.n = this.matrix.length;
 		this.m = this.matrix[0].length;
@@ -29,12 +31,7 @@ public class ImageReconstruction implements Problem {
 	}
 	
 	public double getDifference(int[] A, int[] B) {
-		double sum = 0;
-		for (int i = 0; i < m; i++) {
-			sum += Math.pow(A[i] - B[i], 2);
-		}
-		
-		return Math.sqrt(sum);
+		return this.evaluate.execute(A, B);
 	}
 	
 	

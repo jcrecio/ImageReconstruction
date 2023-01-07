@@ -17,10 +17,10 @@ public class Main {
 				int[] order = new int[512];
 				for (int i = 0; i<512; i++)order[i]=i;
 				FileUtils.ConvertMatrixIntoImage(matrix, order, "output1");
-				
-				
-				int[] order2 = ImageReconstruction.getRandomOrder(512, 512);
-				FileUtils.ConvertMatrixIntoImage(matrix, order2, "output2");
+//				
+//				
+//				int[] order2 = ImageReconstruction.getRandomOrder(512, 512);
+//				FileUtils.ConvertMatrixIntoImage(matrix, order2, "output2");
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -32,105 +32,58 @@ public class Main {
 			// help();
 			return;
 		}
-
-		Problem problem = new ImageReconstruction(args[1]);
-//		Individual bestSolution = new Individual();
-//		bestSolution.setFitness(Double.MAX_VALUE);
-//		ProblemParameters pp = new ProblemParameters();
-//		pp.setNumberOfEvaluations(1000);
-//		for (double i = 0.8; i > 0.09; i -= 0.1) {
-//			pp.setMutationProbability(i);
-//			for (int j = 10; j < 100; j += 25) {
-//				pp.setPopulationSize(j);
-//				for (int k = 20; k < 250; k += 20) {
-//					pp.setCut1(k);
-//					pp.setCut2(500 - k);
-//					Map<String, Double> params = readEAParameters(pp);
-//					EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm(params, problem);
-//
-//					Individual partialBestSolution = evolutionaryAlgorithm.run();
-//					if (partialBestSolution.getFitness()<bestSolution.getFitness()) {
-//						bestSolution = partialBestSolution;
-//						try {
-//							FileUtils.ConvertMatrixIntoImage(((ImageReconstruction) problem).getMatrix(),
-//									((Permutation) bestSolution).getChromosome(), "output__FITNESS_IS_" + bestSolution.getFitness());
-//						} catch (Exception e) {
-//							e.printStackTrace();
-//						}
-//					}
-//
-//				}
-//
-//			}
-//		}
-//		System.out.println(bestSolution);
-
+	
+		int[][] matrix = FileUtils.readMatrixFromFile(args[1]);
 		
-		Individual bestSolution = new Individual();
-		bestSolution.setFitness(Double.MAX_VALUE);
-		ProblemParameters pp = new ProblemParameters();
-		pp.setNumberOfEvaluations(1000);
-		pp.setMutationProbability(0.5);
-		pp.setCut1(150);
-		pp.setCut2(350);
-		pp.setPopulationSize(100);
-		Map<String, Double> params = readEAParameters(pp);
-		EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm(params, problem);
-
-		Individual partialBestSolution = evolutionaryAlgorithm.run();
-		if (partialBestSolution.getFitness()<bestSolution.getFitness()) {
-			bestSolution = partialBestSolution;
-			try {
-				FileUtils.ConvertMatrixIntoImage(((ImageReconstruction) problem).getMatrix(),
-						((Permutation) bestSolution).getChromosome(), "output__FITNESS_IS_" + bestSolution.getFitness());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-
-//		Map<String, Double> parameters = readEAParameters(args);
-//		EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm(parameters, problem);
-//		
-//		Individual bestSolution = evolutionaryAlgorithm.run();
-//		System.out.println(bestSolution);
+//		int[] order = new int[512];
+//		for (int i = 0; i<512; i++)order[i]=i;
 //		try {
-//			FileUtils.ConvertMatrixIntoImage(((ImageReconstruction)problem).getMatrix(), 
-//					null, "input_");
-//			FileUtils.ConvertMatrixIntoImage(((ImageReconstruction)problem).getMatrix(), 
-//					((Permutation)bestSolution).getChromosome(), "output/output_");
+//			FileUtils.ConvertMatrixIntoImage(matrix, order, "input");
+//			System.out.println();
 //		} catch (Exception e) {
+//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
+//		
+		ProblemParameters pp = new ProblemParameters();
+		pp.setNumberOfEvaluations(1000_000);
+		pp.setMutationProbability(0.35);
+		pp.setPopulationSize(50);
+		Map<String, Double> params = readEAParameters(pp);
+		
+		Problem problemQuadratic = new ImageReconstruction(new QuadraticEvaluateFunction(), args[1]);
+		
+//		double originalValue = problemQuadratic.evaluate(new Permutation(order));
+//		System.out.println(originalValue);
+		
+//		Problem problemDifference = new ImageReconstruction(new DifferenceEvaluateFunction(), args[1]);
+//		Problem problemRange = new ImageReconstruction(new RangeEvaluateFunction(), args[1]);
+		
+		runAlgorithm(params, problemQuadratic, "Quadratic");
+//		runAlgorithm(params, problemDifference, "Difference");
+//		runAlgorithm(params, problemRange, "Range");
 	}
 
+	private static void runAlgorithm(Map<String, Double> inputParams, Problem p, String name) {
+		EvolutionaryAlgorithm difference = new EvolutionaryAlgorithm(inputParams, p);
+
+		Individual solution = difference.run();
+		try {
+			FileUtils.ConvertMatrixIntoImage(((ImageReconstruction) p).getMatrix(),
+					((Permutation) solution).getChromosome(), name + "_" + solution.getFitness());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private static Map<String, Double> readEAParameters(ProblemParameters pp) {
 		Map<String, Double> parameters = new HashMap<>();
 		parameters.put(EvolutionaryAlgorithm.POPULATION_SIZE_PARAM, pp.getPopulationSize());
 		parameters.put(EvolutionaryAlgorithm.MAX_FUNCTION_EVALUATIONS_PARAM, pp.getNumberOfEvaluations());
-		parameters.put(PermutationMutation.PERMUTATION_PROBABILITY_PARAM, pp.getMutationProbability());
+		parameters.put(PermutationSwapMutation.PERMUTATION_PROBABILITY_PARAM, pp.getMutationProbability());
 		parameters.put(EvolutionaryAlgorithm.CUT1, (double)pp.getCut1());
 		parameters.put(EvolutionaryAlgorithm.CUT2, (double)pp.getCut2());
-
-		long randomSeed = System.currentTimeMillis();
-//		if (args.length > 4) {
-//			randomSeed = Long.parseLong(args[6]);
-//		}
-		parameters.put(EvolutionaryAlgorithm.RANDOM_SEED_PARAM, (double) randomSeed);
-		return parameters;
-	}
-
-	private static Map<String, Double> readEAParameters(String[] args) {
-		Map<String, Double> parameters = new HashMap<>();
-		parameters.put(EvolutionaryAlgorithm.POPULATION_SIZE_PARAM, Double.parseDouble(args[2]));
-		parameters.put(EvolutionaryAlgorithm.MAX_FUNCTION_EVALUATIONS_PARAM, Double.parseDouble(args[3]));
-		parameters.put(PermutationMutation.PERMUTATION_PROBABILITY_PARAM, Double.parseDouble(args[4]));
-
-		long randomSeed = System.currentTimeMillis();
-		if (args.length > 4) {
-			randomSeed = Long.parseLong(args[6]);
-		}
-		parameters.put(EvolutionaryAlgorithm.RANDOM_SEED_PARAM, (double) randomSeed);
+		parameters.put(EvolutionaryAlgorithm.RANDOM_SEED_PARAM, (double) System.currentTimeMillis());
 		return parameters;
 	}
 }

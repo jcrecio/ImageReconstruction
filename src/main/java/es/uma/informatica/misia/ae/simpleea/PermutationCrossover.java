@@ -22,10 +22,7 @@ public class PermutationCrossover implements Crossover {
 		Permutation permutation1 = (Permutation) individual1;
 		Permutation permutation2 = (Permutation) individual2;
 		
-//		// 2 points of cut
-//		int cut1 = rnd.nextInt(permutation1.getChromosome().length / 2);
-//		int cut2 = rnd.nextInt(cut1+1, permutation2.getChromosome().length);
-
+		// 2 points of cut
 		Permutation child = new Permutation(permutation1);
 		
 		Map<Integer, Boolean> inclusionInChild = new HashMap<>();
@@ -37,7 +34,7 @@ public class PermutationCrossover implements Crossover {
 			z++;
 		}
 		
-		for (int i = 0; i < permutation2.getChromosome().length; i++) {
+		for (int i = 0; i < permutation2.getChromosome().length && z < 512; i++) {
 			int value = permutation2.getChromosome()[i];
 			if (!inclusionInChild.containsKey(value)) {
 				child.getChromosome()[z] = value;
