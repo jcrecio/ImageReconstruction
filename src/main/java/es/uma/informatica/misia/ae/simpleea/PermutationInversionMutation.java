@@ -15,33 +15,31 @@ public class PermutationInversionMutation implements Mutation {
 
 	@Override
 	public Individual apply(Individual individual) {
+
+		if (rnd.nextDouble() >= prob) return individual;
+		
 		Permutation original = (Permutation) individual;
 		Permutation mutated = new Permutation(original);
+		
 		int length = mutated.getChromosome().length;
-		if (rnd.nextDouble() < prob) {
-			int random1 = new Random().nextInt(length);
-			int random2_ = new Random().nextInt(length);
-			int random2;
-			if (random1 < random2_) random2 = random2_;
-			else {
-				random2 = random1;
-				random1 = random2_;
-			}
-			
-			for (int i = 0; i < (random2_ - random1) / 2; i++) {
-				int valueA = mutated.getChromosome()[random1 + i];
-				int valueB = mutated.getChromosome()[random2 - i];
-				mutated.getChromosome()[random1 + i] = valueB;
-				try {
-					mutated.getChromosome()[random1 - i] = valueA;
-
-				}
-				catch(Exception ex) {
-					int a = 1;
-				}
-			}
-			
+		int random1 = rnd.nextInt(length);
+		int random2_ = rnd.nextInt(length);
+		int random2;
+		
+		if (random1 < random2_) random2 = random2_;
+		else {
+			random2 = random1;
+			random1 = random2_;
 		}
+		
+		int x = random2 - ((random2-random1)/2);
+		for (int i = random1; i < x; i++) {
+			int valueA = mutated.getChromosome()[i];
+			int valueB = mutated.getChromosome()[random2 - (i - random1)];
+			mutated.getChromosome()[i] = valueB;
+			mutated.getChromosome()[random2 - (i - random1)] = valueA;
+		}
+		
 		return mutated;
 	}
 

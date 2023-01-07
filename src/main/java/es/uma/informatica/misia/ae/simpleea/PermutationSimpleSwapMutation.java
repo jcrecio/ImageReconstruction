@@ -19,8 +19,8 @@ public class PermutationSimpleSwapMutation implements Mutation {
 		Permutation mutated = new Permutation(original);
 		int length = mutated.getChromosome().length;
 		if (rnd.nextDouble() < prob) {
-			int random1 = new Random().nextInt(length);
-			int random2 = new Random().nextInt(length);
+			int random1 = rnd.nextInt(length);
+			int random2 = rnd.nextInt(length);
 			
 			int valueA = mutated.getChromosome()[random1];
 			int valueB = mutated.getChromosome()[random2];

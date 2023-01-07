@@ -1,15 +1,11 @@
 package es.uma.informatica.misia.ae.simpleea;
 
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -42,15 +38,7 @@ public class FileUtils {
 				}
 			}
 		}
-
-//		for (int i = 0; i < 512; i++) {
-//		    for (int j = i + 1; j < 512; j++) {
-//		        int temp = matrix[i][j];
-//		        matrix[i][j] = matrix[j][i];
-//		        matrix[j][i] = temp;
-//		    }
-//		}
-		
+			
 		return matrix;
 	}
 	
@@ -64,14 +52,7 @@ public class FileUtils {
 		  }
 		int yLength = matrix[0].length;
 		BufferedImage bufferedImage = new BufferedImage(matrix.length, yLength, BufferedImage.TYPE_BYTE_GRAY);
-				
-//		for (int i = 0; i < 512; i++) {
-//		    for (int j = i + 1; j < 512; j++) {
-//		        int temp = matrix[i][j];
-//		        matrix[i][j] = matrix[j][i];
-//		        matrix[j][i] = temp;
-//		    }
-//		}
+
 		for (int i = 0; i < matrix.length; i++) {
 			int[] row = matrix[order[i]];
 			for (int j = 0; j < row.length; j++) {
@@ -79,7 +60,6 @@ public class FileUtils {
 		        bufferedImage.setRGB(i, j, color);        
 			}
 		}
-
 		
 		try {
 			boolean result = ImageIO.write(bufferedImage, "bmp", new File(outputFile + System.currentTimeMillis() + ".bmp"));

@@ -2,13 +2,13 @@ package es.uma.informatica.misia.ae.simpleea;
 
 import java.util.Random;
 
-public class PermutationScrumbleMutation implements Mutation {
+public class PermutationScrambleMutation implements Mutation {
 
 	private double prob;
 	private Random rnd;
 	public static final String PERMUTATION_PROBABILITY_PARAM = "permutationProbability";
 	
-	public PermutationScrumbleMutation (Random rnd, double prob) {
+	public PermutationScrambleMutation (Random rnd, double prob) {
 		this.rnd = rnd;
 		this.prob = prob;
 	}
@@ -20,8 +20,8 @@ public class PermutationScrumbleMutation implements Mutation {
 		int length = mutated.getChromosome().length;
 		if (rnd.nextDouble() < prob) {
 			int random1 = -1, random2 = -1;
-			int random1_ = new Random().nextInt(1, length - 1);
-			int random2_ = new Random().nextInt(1, length - 1);
+			int random1_ = rnd.nextInt(1, length - 1);
+			int random2_ = rnd.nextInt(1, length - 1);
 
 			if (random1_ > random2_) {
 				int r1_ = random1_;

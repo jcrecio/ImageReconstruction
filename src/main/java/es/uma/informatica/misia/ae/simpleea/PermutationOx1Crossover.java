@@ -4,16 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class PermutationCrossover implements Crossover {
+public class PermutationOx1Crossover implements Crossover {
 	
-	private Random rnd;
-	private int cut1;
-	private int cut2;
+	private Random random;
 	
-	public PermutationCrossover(Random rnd, int cut1, int cut2) {
-		this.rnd=rnd;
-		this.cut1 = cut1;
-		this.cut2 = cut2;
+	public PermutationOx1Crossover(Random rnd) {
+		this.random = rnd;
 	}
 
 	@Override
@@ -22,12 +18,19 @@ public class PermutationCrossover implements Crossover {
 		Permutation permutation1 = (Permutation) individual1;
 		Permutation permutation2 = (Permutation) individual2;
 		
-		// 2 points of cut
+		int lowerCut = random.nextInt(511);
+		int upperCut = random.nextInt(511);
+		if (lowerCut >= upperCut) {
+			int lowerCut_ = lowerCut;
+			lowerCut = upperCut;
+			upperCut = lowerCut_;
+		}
+		
 		Permutation child = new Permutation(permutation1);
 		
 		Map<Integer, Boolean> inclusionInChild = new HashMap<>();
 		int z = 0;
-		for (int i = cut1; i < cut2; i++) {
+		for (int i = lowerCut; i < upperCut; i++) {
 			int value = permutation1.getChromosome()[i];
 			child.getChromosome()[z] = value;
 			inclusionInChild.put(value, true);

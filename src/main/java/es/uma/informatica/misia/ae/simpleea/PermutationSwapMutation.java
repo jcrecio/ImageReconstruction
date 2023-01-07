@@ -19,8 +19,8 @@ public class PermutationSwapMutation implements Mutation {
 		Permutation mutated = new Permutation(original);
 		int length = mutated.getChromosome().length;
 		if (rnd.nextDouble() < prob) {
-			int random1 = new Random().nextInt(length);
-			int random2_ = new Random().nextInt(length);
+			int random1 = rnd.nextInt(length);
+			int random2_ = rnd.nextInt(length);
 			int random2;
 			if (random1 < random2_) random2 = random2_;
 			else {

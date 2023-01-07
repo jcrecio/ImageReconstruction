@@ -1,6 +1,6 @@
 package es.uma.informatica.misia.ae.simpleea;
 
-public class QuadraticEvaluateFunction implements EvaluateFunction {
+public class EuclideanDistanceEvaluateFunction implements EvaluateFunction {
 	public double execute(int[] A, int[] B) {
 		double sum = 0;
 		for (int i = 0; i < A.length; i++) {

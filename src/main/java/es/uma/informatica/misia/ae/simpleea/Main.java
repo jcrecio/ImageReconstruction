@@ -2,74 +2,98 @@ package es.uma.informatica.misia.ae.simpleea;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class Main {
 
+	public static boolean ENABLE_LOGS = true;
+	
 	public static void main(String args[]) {
 		if (args.length < 2) {
-			// help();
+			help();
 			return;
 		}
-		if (args[0].equals("convert")) {
+		if (args[0].equals("display")) {
 			try {
 				int[][] matrix = FileUtils.readMatrixFromFile(args[1]);
 				
 				int[] order = new int[512];
 				for (int i = 0; i<512; i++)order[i]=i;
 				FileUtils.ConvertMatrixIntoImage(matrix, order, "output1");
-//				
-//				
-//				int[] order2 = ImageReconstruction.getRandomOrder(512, 512);
-//				FileUtils.ConvertMatrixIntoImage(matrix, order2, "output2");
 				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return;
 		}
-
-		if (args.length < 6) {
-			// help();
+		if (args[0].equals("evaluate")) {
+			Problem problem = new ImageReconstruction(new EuclideanDistanceEvaluateFunction(), args[1]);
+			int[] order = new int[512];
+			for (int i = 0; i<512; i++)order[i]=i;
+			double fitness = problem.evaluate(new Permutation(order));
+			System.out.println(fitness);
 			return;
 		}
-	
-		int[][] matrix = FileUtils.readMatrixFromFile(args[1]);
+
+		if (args.length < 6) {
+			help();
+			return;
+		}
 		
-//		int[] order = new int[512];
-//		for (int i = 0; i<512; i++)order[i]=i;
-//		try {
-//			FileUtils.ConvertMatrixIntoImage(matrix, order, "input");
-//			System.out.println();
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-		ProblemParameters pp = new ProblemParameters();
-		pp.setNumberOfEvaluations(1000_000);
-		pp.setMutationProbability(0.35);
-		pp.setPopulationSize(50);
-		Map<String, Double> params = readEAParameters(pp);
+		long seedParam = System.currentTimeMillis();
+		if (args.length == 8) {
+			seedParam = Long.parseLong(args[7]);
+		}
 		
-		Problem problemQuadratic = new ImageReconstruction(new QuadraticEvaluateFunction(), args[1]);
+		Random seed = new Random(seedParam);
+
 		
-//		double originalValue = problemQuadratic.evaluate(new Permutation(order));
-//		System.out.println(originalValue);
+		String file = args[1];
+		int populationSize = Integer.parseInt(args[2]);
+		int numberOfEvaluations = Integer.parseInt(args[3]);
+		double mutationProbability = Double.parseDouble(args[4]);
+		Crossover recombinationOperator = null;
+		Mutation mutationOperator = null;
+		try {
+			mutationOperator = getMutationOperator(args[5], mutationProbability, seed);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			recombinationOperator = getRecombinationOperator(args[6], seed);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
-//		Problem problemDifference = new ImageReconstruction(new DifferenceEvaluateFunction(), args[1]);
-//		Problem problemRange = new ImageReconstruction(new RangeEvaluateFunction(), args[1]);
+		ProblemParameters problemParameters = new ProblemParameters();
+		problemParameters.setNumberOfEvaluations(numberOfEvaluations);
+		problemParameters.setMutationProbability(0.15);
+		problemParameters.setPopulationSize(populationSize);
 		
-		runAlgorithm(params, problemQuadratic, "Quadratic");
-//		runAlgorithm(params, problemDifference, "Difference");
-//		runAlgorithm(params, problemRange, "Range");
+		Map<String, Double> params = readEAParameters(problemParameters);
+
+		Problem problem = new ImageReconstruction(new EuclideanDistanceEvaluateFunction(), file);
+		
+		runAlgorithm(params, 
+				problem, 
+				mutationOperator,
+				recombinationOperator,
+				
+				getNameExecution(args[5], mutationProbability, args[6], populationSize,
+						numberOfEvaluations));
 	}
 
-	private static void runAlgorithm(Map<String, Double> inputParams, Problem p, String name) {
-		EvolutionaryAlgorithm difference = new EvolutionaryAlgorithm(inputParams, p);
+	private static void runAlgorithm(Map<String, Double> inputParams, 
+			Problem problem, 
+			Mutation mutation,
+			Crossover recombination,
+			String name) {
+		EvolutionaryAlgorithm difference = 
+				new EvolutionaryAlgorithm(inputParams, problem, mutation, recombination);
 
 		Individual solution = difference.run();
 		try {
-			FileUtils.ConvertMatrixIntoImage(((ImageReconstruction) p).getMatrix(),
+			FileUtils.ConvertMatrixIntoImage(((ImageReconstruction) problem).getMatrix(),
 					((Permutation) solution).getChromosome(), name + "_" + solution.getFitness());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -81,9 +105,48 @@ public class Main {
 		parameters.put(EvolutionaryAlgorithm.POPULATION_SIZE_PARAM, pp.getPopulationSize());
 		parameters.put(EvolutionaryAlgorithm.MAX_FUNCTION_EVALUATIONS_PARAM, pp.getNumberOfEvaluations());
 		parameters.put(PermutationSwapMutation.PERMUTATION_PROBABILITY_PARAM, pp.getMutationProbability());
-		parameters.put(EvolutionaryAlgorithm.CUT1, (double)pp.getCut1());
-		parameters.put(EvolutionaryAlgorithm.CUT2, (double)pp.getCut2());
 		parameters.put(EvolutionaryAlgorithm.RANDOM_SEED_PARAM, (double) System.currentTimeMillis());
 		return parameters;
+	}
+	
+	private static Mutation getMutationOperator(String mutation, double mutationProbability, 
+			Random seed) throws Exception {
+		switch(mutation) {
+			case "inversion": return new PermutationInversionMutation(seed, mutationProbability);
+			case "simpleSwap": return new PermutationSimpleSwapMutation(seed, mutationProbability);
+			case "swap": return new PermutationSwapMutation(seed, mutationProbability);
+			case "scramble": return new PermutationScrambleMutation(seed, mutationProbability);
+			default: throw new Exception("Specify a valid mutation operator");
+		}
+	}
+	
+	private static Crossover getRecombinationOperator(String recombination, Random seed) 
+			throws Exception {
+		switch(recombination) {
+			case "edge": return new PermutationEdgeCrossover(seed);
+			case "ox1": return new PermutationOx1Crossover(seed);
+			default: throw new Exception("Specify a valid recombination operator");
+		}
+	}
+	
+	private static String getNameExecution(String mutationName, double mutationProbability,
+			String recombinationMutation, int populationSize, int evaluationFunctions) {
+		return mutationName + "_" + mutationProbability + "___" + recombinationMutation +
+				"___population_" + populationSize + "___evaluations_" + evaluationFunctions;
+	}
+	
+	private static void help() {
+		System.out.println("Image Reconstruction.");
+		System.out.println("-------------------------------------------------");
+		System.out.println();
+		System.out.println();
+		System.out.println("Modes available: display, run");
+		System.out.println("-------------------------------------------------");
+		System.out.println("Mode display:");
+		System.out.println("$ display <file with int matrix>");
+		System.out.println();
+		System.out.println();
+		System.out.println("Mode run:");
+		System.out.println("$ run <file> <population size> <number of evaluations> <mutation probability> <mutation operator> <recombination operator> [seed]");
 	}
 }

@@ -96,7 +96,12 @@ public class PermutationEdgeCrossover implements Crossover {
 				genesToAdd = new ArrayList<Integer>();		
 				while(genesToAdd.size()==0) {
 					int randomMinimumIndex = rnd.nextInt(0, 511);
-					genesToAdd = adjacencyMatrixResult.get(minimums.get(randomMinimumIndex));
+					try {
+						genesToAdd = adjacencyMatrixResult.get(minimums.get(randomMinimumIndex));
+					}
+					catch(Exception ex) {
+						int x = 2;
+					}
 				}
 			}
 		}

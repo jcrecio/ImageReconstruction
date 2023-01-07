@@ -18,7 +18,7 @@ public class EvolutionaryAlgorithm {
 	private int maxFunctionEvaluations;
 	private List<Individual> population;
 	private int populationSize;
-	private Random rnd;
+	private Random seed;
 	
 	private Individual bestSolution;
 	
@@ -27,23 +27,27 @@ public class EvolutionaryAlgorithm {
 	private Mutation mutation;
 	private Crossover recombination;
 	
-	public EvolutionaryAlgorithm(Map<String, Double> parameters, Problem problem) {
-		configureAlgorithm(parameters, problem);
+	public EvolutionaryAlgorithm(
+			Map<String, Double> parameters, 
+			Problem problem,
+			Mutation mutation,
+			Crossover recombination) {
+		configureAlgorithm(parameters, problem, mutation, recombination);
 	}
 	
-	private void configureAlgorithm(Map<String, Double> parameters, Problem problem) {
+	private void configureAlgorithm(Map<String, Double> parameters, 
+			Problem problem, Mutation mutation, Crossover recombination){
+		
 		populationSize = parameters.get(POPULATION_SIZE_PARAM).intValue();
 		maxFunctionEvaluations = parameters.get(MAX_FUNCTION_EVALUATIONS_PARAM).intValue();
-		double mutationProb = parameters.get(PermutationSwapMutation.PERMUTATION_PROBABILITY_PARAM);
+		
 		long randomSeed = parameters.get(RANDOM_SEED_PARAM).longValue();
 		this.problem = problem; 
-		
-		rnd = new Random(randomSeed);
-		
-		selection = new BinaryTournament(rnd);
-		replacement = new ElitistReplacement();
-		mutation = new PermutationInversionMutation(rnd, mutationProb);
-		recombination = new PermutationEdgeCrossover(rnd);
+		this.seed = new Random(randomSeed);
+		this.mutation = mutation;
+		this.selection = new BinaryTournament(seed);
+		this.replacement = new ElitistReplacement();
+		this.recombination = recombination;
 	}
 	
 	public Individual run() {
@@ -58,7 +62,9 @@ public class EvolutionaryAlgorithm {
 			child = mutation.apply(child);
 			evaluateIndividual(child);
 			population = replacement.replacement(population, Arrays.asList(child));
-			System.out.println("Evaluation number: " + functionEvaluations + " fitness: " + + bestSolution.getFitness());
+			if (Main.ENABLE_LOGS) {
+				System.out.println("Evaluation number: " + functionEvaluations + " fitness: " + + bestSolution.getFitness());
+			}
 		}
 		
 		return bestSolution;
@@ -86,7 +92,7 @@ public class EvolutionaryAlgorithm {
 	private List<Individual> generateInitialPopulation() {
 		List<Individual> population = new ArrayList<>();
 		for (int i=0; i < populationSize; i++) {
-			population.add(problem.generateRandomIndividual(rnd));
+			population.add(problem.generateRandomIndividual(seed));
 		}
 		return population;
 	}

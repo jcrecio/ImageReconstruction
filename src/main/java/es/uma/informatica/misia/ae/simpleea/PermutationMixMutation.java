@@ -19,8 +19,8 @@ public class PermutationMixMutation implements Mutation {
 		Permutation mutated = new Permutation(original);
 		int length = mutated.getChromosome().length;
 		if (rnd.nextDouble() < prob) {
-			int random = new Random().nextInt(length);
-			int random2 = new Random().nextInt(length);
+			int random = rnd.nextInt(length);
+			int random2 = rnd.nextInt(length);
 
 			int valueA = mutated.getChromosome()[random];
 			int valueB = mutated.getChromosome()[random2];
