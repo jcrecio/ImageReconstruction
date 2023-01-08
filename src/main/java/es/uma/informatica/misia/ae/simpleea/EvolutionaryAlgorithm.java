@@ -19,6 +19,7 @@ public class EvolutionaryAlgorithm {
 	private List<Individual> population;
 	private int populationSize;
 	private Random seed;
+	private boolean includeInitialChromosome;
 	
 	private Individual bestSolution;
 	
@@ -31,12 +32,15 @@ public class EvolutionaryAlgorithm {
 			Map<String, Double> parameters, 
 			Problem problem,
 			Mutation mutation,
-			Crossover recombination) {
-		configureAlgorithm(parameters, problem, mutation, recombination);
+			Crossover recombination,
+			boolean includeInitialChromosome) {
+		configureAlgorithm(parameters, problem, mutation, recombination,
+				includeInitialChromosome);
 	}
 	
 	private void configureAlgorithm(Map<String, Double> parameters, 
-			Problem problem, Mutation mutation, Crossover recombination){
+			Problem problem, Mutation mutation, Crossover recombination,
+			boolean includeInitialChromosome){
 		
 		populationSize = parameters.get(POPULATION_SIZE_PARAM).intValue();
 		maxFunctionEvaluations = parameters.get(MAX_FUNCTION_EVALUATIONS_PARAM).intValue();
@@ -59,7 +63,7 @@ public class EvolutionaryAlgorithm {
 			Individual parent1 = selection.selectParent(population);
 			Individual parent2 = selection.selectParent(population);
 			Individual child = recombination.apply(parent1, parent2);
-			child = mutation.apply(child);
+			child = mutation.apply(child, functionEvaluations);
 			evaluateIndividual(child);
 			population = replacement.replacement(population, Arrays.asList(child));
 			if (Main.ENABLE_LOGS) {
@@ -93,6 +97,11 @@ public class EvolutionaryAlgorithm {
 		List<Individual> population = new ArrayList<>();
 		for (int i=0; i < populationSize; i++) {
 			population.add(problem.generateRandomIndividual(seed));
+		}
+		if (includeInitialChromosome) {
+			int[] order = new int[512];
+			for (int i = 0; i<512; i++)order[i]=i;
+			population.add(new Permutation(order));
 		}
 		return population;
 	}

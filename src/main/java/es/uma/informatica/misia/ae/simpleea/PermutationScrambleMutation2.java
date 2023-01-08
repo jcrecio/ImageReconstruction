@@ -2,19 +2,31 @@ package es.uma.informatica.misia.ae.simpleea;
 
 import java.util.Random;
 
-public class PermutationScrambleMutation implements Mutation {
+public class PermutationScrambleMutation2 implements Mutation {
 
 	private double prob;
 	private Random rnd;
+	private EvaluationsVariableMutation variableMutation;
 	public static final String PERMUTATION_PROBABILITY_PARAM = "permutationProbability";
 	
-	public PermutationScrambleMutation (Random rnd, double prob, EvaluationsVariableMutation m) {
+	public PermutationScrambleMutation2 (Random rnd, double prob, EvaluationsVariableMutation m) {
 		this.rnd = rnd;
 		this.prob = prob;
+		this.variableMutation = m;
 	}
 
 	@Override
 	public Individual apply(Individual individual, int numberOfEvaluations) {
+		if (variableMutation != null) {
+			for(int i = 0; i < variableMutation.getEvaluationInterval().length; i++) {
+				if (numberOfEvaluations > variableMutation.getEvaluationInterval()[i]) {
+					if (rnd.nextDouble() >= variableMutation.getMutationInterval()[i]) {
+						return individual;
+					}
+				}
+			}
+		}
+
 		Permutation original = (Permutation) individual;
 		Permutation mutated = new Permutation(original);
 		int length = mutated.getChromosome().length;
@@ -32,13 +44,18 @@ public class PermutationScrambleMutation implements Mutation {
 				random1 = random1_;
 				random2 = random2_;
 			}
+			int checkDiff = random2-random1;
+			if (checkDiff == 0) return new Permutation(original);
+			int slidingWindow = rnd.nextInt(checkDiff);
 			
 			for (int i = random1; i < random2; i++) {
-				if (i == random1) {
-					mutated.getChromosome()[random1] = mutated.getChromosome()[random2];
-					continue;
+				if (i + slidingWindow < random2) {
+					mutated.getChromosome()[i + slidingWindow] = original.getChromosome()[i];
 				}
-				mutated.getChromosome()[i] = mutated.getChromosome()[i+1];
+				else {
+					int position = random1 + (i + slidingWindow - random2);
+					mutated.getChromosome()[position] = original.getChromosome()[i];
+				}
 			}
 		}
 		

@@ -6,16 +6,18 @@ public class PermutationInversionMutation implements Mutation {
 
 	private double prob;
 	private Random rnd;
+	private EvaluationsVariableMutation variableMutation;
 	public static final String PERMUTATION_PROBABILITY_PARAM = "permutationProbability";
 	
-	public PermutationInversionMutation (Random rnd, double prob) {
+	public PermutationInversionMutation (Random rnd, double prob,
+			EvaluationsVariableMutation variableMutation) {
 		this.rnd = rnd;
 		this.prob = prob;
+		this.variableMutation = variableMutation;
 	}
 
 	@Override
-	public Individual apply(Individual individual) {
-
+	public Individual apply(Individual individual, int numberOfEvaluations) {
 		if (rnd.nextDouble() >= prob) return individual;
 		
 		Permutation original = (Permutation) individual;

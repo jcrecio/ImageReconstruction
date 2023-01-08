@@ -40,14 +40,26 @@ public class Main {
 			return;
 		}
 		
+		
 		long seedParam = System.currentTimeMillis();
-		if (args.length == 8) {
+		boolean includeInitialChromosome = false;
+		if (args.length == 8 && !args[7].equals("-m")) {
 			seedParam = Long.parseLong(args[7]);
+		}
+		
+		EvaluationsVariableMutation variableMutation = null;
+		if (args.length == 8 && args[7].equals("-m")) {
+			variableMutation = new EvaluationsVariableMutation(
+					new int[] {500, 1000, 1500},
+					new double[] {0.35, 0.15, 0.012});
+		}
+		if (args.length == 9) {
+			includeInitialChromosome = args[7].equals("true");
+			seedParam = Long.parseLong(args[8]);
 		}
 		
 		Random seed = new Random(seedParam);
 
-		
 		String file = args[1];
 		int populationSize = Integer.parseInt(args[2]);
 		int numberOfEvaluations = Integer.parseInt(args[3]);
@@ -55,7 +67,7 @@ public class Main {
 		Crossover recombinationOperator = null;
 		Mutation mutationOperator = null;
 		try {
-			mutationOperator = getMutationOperator(args[5], mutationProbability, seed);
+			mutationOperator = getMutationOperator(args[5], mutationProbability, seed, variableMutation);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -67,7 +79,7 @@ public class Main {
 		
 		ProblemParameters problemParameters = new ProblemParameters();
 		problemParameters.setNumberOfEvaluations(numberOfEvaluations);
-		problemParameters.setMutationProbability(0.15);
+		problemParameters.setMutationProbability(mutationProbability);
 		problemParameters.setPopulationSize(populationSize);
 		
 		Map<String, Double> params = readEAParameters(problemParameters);
@@ -78,7 +90,7 @@ public class Main {
 				problem, 
 				mutationOperator,
 				recombinationOperator,
-				
+				includeInitialChromosome,
 				getNameExecution(args[5], mutationProbability, args[6], populationSize,
 						numberOfEvaluations));
 	}
@@ -87,9 +99,11 @@ public class Main {
 			Problem problem, 
 			Mutation mutation,
 			Crossover recombination,
+			boolean includeInitialPopulation,
 			String name) {
 		EvolutionaryAlgorithm difference = 
-				new EvolutionaryAlgorithm(inputParams, problem, mutation, recombination);
+				new EvolutionaryAlgorithm(inputParams, problem, mutation, recombination, 
+						includeInitialPopulation);
 
 		Individual solution = difference.run();
 		try {
@@ -110,12 +124,14 @@ public class Main {
 	}
 	
 	private static Mutation getMutationOperator(String mutation, double mutationProbability, 
-			Random seed) throws Exception {
+			Random seed, EvaluationsVariableMutation variableMutation) throws Exception {
 		switch(mutation) {
-			case "inversion": return new PermutationInversionMutation(seed, mutationProbability);
-			case "simpleSwap": return new PermutationSimpleSwapMutation(seed, mutationProbability);
-			case "swap": return new PermutationSwapMutation(seed, mutationProbability);
-			case "scramble": return new PermutationScrambleMutation(seed, mutationProbability);
+			case "inversion": return new PermutationInversionMutation(seed, mutationProbability, variableMutation);
+			case "simpleSwap": return new PermutationSimpleSwapMutation(seed, mutationProbability, variableMutation);
+			case "swap": return new PermutationSwapMutation(seed, mutationProbability, variableMutation);
+			case "scramble": return new PermutationScrambleMutation(seed, mutationProbability, variableMutation);
+			case "scramble2": return new PermutationScrambleMutation2(seed, mutationProbability, variableMutation);
+
 			default: throw new Exception("Specify a valid mutation operator");
 		}
 	}
@@ -147,6 +163,6 @@ public class Main {
 		System.out.println();
 		System.out.println();
 		System.out.println("Mode run:");
-		System.out.println("$ run <file> <population size> <number of evaluations> <mutation probability> <mutation operator> <recombination operator> [seed]");
+		System.out.println("$ run <file> <population size> <number of evaluations> <mutation probability> <mutation operator> <recombination operator> [includeInitialChromosome] [seed]");
 	}
 }

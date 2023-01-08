@@ -100,7 +100,7 @@ public class PermutationEdgeCrossover implements Crossover {
 						genesToAdd = adjacencyMatrixResult.get(minimums.get(randomMinimumIndex));
 					}
 					catch(Exception ex) {
-						int x = 2;
+						System.out.println("Error in edge" + ex);
 					}
 				}
 			}

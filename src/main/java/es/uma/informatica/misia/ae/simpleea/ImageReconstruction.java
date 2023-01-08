@@ -35,7 +35,7 @@ public class ImageReconstruction implements Problem {
 	}
 	
 	
-	public Permutation generateRandomIndividual(Random rnd) {
+	public Permutation generateRandomIndividual(Random random) {
 	    int a[] = new int[n];
 
 	    for (int i = 0; i < n; i++) {
@@ -82,6 +82,14 @@ public class ImageReconstruction implements Problem {
 	        x--;
 	    }
 	    return result;
+	}
+	
+	public static byte[] intSeedToByteArray(int seed) {
+		    return new byte[] {
+	            (byte)(seed >>> 24),
+	            (byte)(seed >>> 16),
+	            (byte)(seed >>> 8),
+	            (byte)seed};
 	}
 	
 	public int[][] getMatrix(){
