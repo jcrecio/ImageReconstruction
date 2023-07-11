@@ -1,3 +1,4 @@
-# Simple Evolutionary Algorithm
+# Evolutionary Algorithm to Reconstruct Images
 
-This is a very simple evolutionary algorithm implementation in Java for didactical purposes. It was created by Francisco Chicano for the course "Evolutionary Algorithms" of the Master in Software Engineering and Artificial Intelligence of the University of Malaga (Spain).
+## Version 1. January 8th, 2023
+This version provides a mechanism to reconstruct grey-scale images based on a evolutionary algorithm. The method and the implementation usage can be found [here].(https://github.com/jcrecio/ImageReconstruction/blob/main/ImageReconstructionDocument_20230108_version1.pdf)
